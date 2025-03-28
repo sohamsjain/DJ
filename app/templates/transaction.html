@@ -1,0 +1,239 @@
+{% extends "shell.html" %}
+
+{% block page %}
+<div class="container mx-auto px-4 py-8">
+    <div class="px-4 mx-auto max-w-screen-2xl lg:px-12 mb-8">
+        <div class="flex items-center gap-3 mb-6">
+            <a href="{{ url_for('main.user', id=transaction.user.id) }}"
+               class="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to User
+            </a>
+        </div>
+
+        <!-- Transaction Details Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        Transaction #{{ transaction.id }}
+                    </h1>
+                    <p class="text-gray-500 dark:text-gray-400">
+                        {{ transaction.created_at_est }}
+                    </p>
+                </div>
+                <span class="px-3 py-1.5 text-sm font-medium whitespace-nowrap
+                    {% if transaction.status == 'Approval pending' %}text-yellow-500 bg-yellow-900
+                    {% elif transaction.status == 'Complete' %}text-green-300 bg-green-900
+                    {% elif transaction.status == 'Rejected' %}text-red-300 bg-red-900
+                    {% endif %} rounded">
+                    {{ transaction.status }}
+                </span>
+            </div>
+
+            <div class="grid gap-6 mb-8 md:grid-cols-2">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Transaction Information</h2>
+                    <dl class="max-w-md space-y-4 text-gray-900 dark:text-white">
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">User:</dt>
+                            <dd class="text-sm">{{ transaction.user.username }}</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Type:</dt>
+                            <dd class="text-sm">
+                                <span class="px-2 py-1 text-xs font-medium whitespace-nowrap
+                                    {% if transaction.type == 'Deposit' %}text-green-300 bg-green-900
+                                    {% elif transaction.type == 'Withdrawal' %}text-red-300 bg-red-900
+                                    {% elif transaction.type == 'Earnings' %}text-blue-300 bg-blue-900
+                                    {% endif %} rounded">
+                                    {{ transaction.type }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Amount:</dt>
+                            <dd class="text-sm font-semibold">${{ "%.2f"|format(transaction.amount) }}</dd>
+                        </div>
+                        {% if transaction.reference_id %}
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Reference ID:</dt>
+                            <dd class="text-sm">{{ transaction.reference_id }}</dd>
+                        </div>
+                        {% endif %}
+                        {% if transaction.description %}
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Description:</dt>
+                            <dd class="text-sm">{{ transaction.description }}</dd>
+                        </div>
+                        {% endif %}
+                        {% if transaction.status == 'Complete' %}
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Completed At:</dt>
+                            <dd class="text-sm">{{ transaction.completed_at_est }}</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Balance Before:</dt>
+                            <dd class="text-sm">${{ "%.2f"|format(transaction.balance_before) }}</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Balance After:</dt>
+                            <dd class="text-sm">${{ "%.2f"|format(transaction.balance_after) }}</dd>
+                        </div>
+                        {% endif %}
+                    </dl>
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Proof of Transaction</h2>
+                    {% if transaction.proof_of_transaction %}
+                    <div class="mb-4">
+                        <a href="{{ url_for('main.download_file', filename=transaction.proof_of_transaction) }}"
+                           class="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400 mb-3">
+                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Download Proof
+                        </a>
+
+                        <!-- Display preview if image -->
+                        {% if transaction.proof_of_transaction.endswith(('.jpg', '.jpeg', '.png')) %}
+                        <div class="relative h-64 w-full overflow-hidden rounded-lg border border-gray-300 bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                            <img src="{{ url_for('main.download_file', filename=transaction.proof_of_transaction) }}"
+                                class="h-full w-full object-contain" alt="Proof of transaction">
+                        </div>
+                        {% elif transaction.proof_of_transaction.endswith('.pdf') %}
+                        <div class="relative h-64 w-full overflow-hidden rounded-lg border border-gray-300 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-400 mt-2">PDF Document</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="text-gray-500 dark:text-gray-400 mb-4">No proof of transaction provided</div>
+                    {% endif %}
+
+                    <!-- Update Proof Form (only show if transaction is pending) -->
+                    {% if transaction.status == 'Approval pending' %}
+                    <form method="POST" enctype="multipart/form-data" class="mt-4">
+                        {{ update_proof_form.hidden_tag() }}
+                        <input type="hidden" name="action" value="update_proof">
+
+                        <div class="mb-4">
+                            <label for="{{ update_proof_form.proof_of_transaction.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Update Proof of Transaction
+                            </label>
+                            <div class="flex items-center justify-center w-full">
+                                <label for="{{ update_proof_form.proof_of_transaction.id }}" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                        </svg>
+                                        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">JPG, JPEG, PNG or PDF (MAX. 10MB)</p>
+                                    </div>
+                                    {{ update_proof_form.proof_of_transaction(class="hidden") }}
+                                </label>
+                            </div>
+                            <div id="updateFileNameDisplay" class="mt-2 text-sm text-gray-500 dark:text-gray-400"></div>
+                            {% if update_proof_form.proof_of_transaction.errors %}
+                                <div class="text-red-500 text-sm mt-1">
+                                    {% for error in update_proof_form.proof_of_transaction.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {{ update_proof_form.submit(class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800") }}
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Approvals Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Approvals</h2>
+
+            {% if transaction.approvals %}
+            <div class="overflow-x-auto mb-6">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Admin</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                            <th scope="col" class="px-6 py-3">Date</th>
+                            <th scope="col" class="px-6 py-3">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for approval in transaction.approvals %}
+                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{ approval.admin.username }}
+                            </th>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full
+                                    {% if approval.approved %}text-green-300 bg-green-900{% else %}text-red-300 bg-red-900{% endif %}">
+                                    {% if approval.approved %}Approved{% else %}Rejected{% endif %}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">{{ approval.created_at_est }}</td>
+                            <td class="px-6 py-4">{{ approval.notes or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="mb-6 text-gray-500 dark:text-gray-400">No approvals yet</div>
+            {% endif %}
+
+            <!-- Approval Form (only show for admins if transaction is pending) -->
+            {% if transaction.status == 'Approval pending' and current_user.is_admin and not current_user_has_approved %}
+            <form method="POST">
+                {{ approval_form.hidden_tag() }}
+                <input type="hidden" name="action" value="approve">
+
+                <div class="mb-4">
+                    <label for="{{ approval_form.notes.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Notes (Optional)
+                    </label>
+                    {{ approval_form.notes(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500", rows=3, placeholder="Enter approval notes") }}
+                </div>
+
+                <div class="flex gap-4">
+                    {{ approval_form.approve(class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800") }}
+                    {{ approval_form.reject(class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800") }}
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Display selected file name for update proof form
+    document.addEventListener('DOMContentLoaded', function() {
+        const updateFileInput = document.getElementById('{{ update_proof_form.proof_of_transaction.id }}');
+        const updateFileNameDisplay = document.getElementById('updateFileNameDisplay');
+
+        if (updateFileInput && updateFileNameDisplay) {
+            updateFileInput.addEventListener('change', function() {
+                if (updateFileInput.files.length > 0) {
+                    updateFileNameDisplay.textContent = 'Selected file: ' + updateFileInput.files[0].name;
+                } else {
+                    updateFileNameDisplay.textContent = '';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

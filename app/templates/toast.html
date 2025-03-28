@@ -1,0 +1,59 @@
+{# toast_notifications.html #}
+{% macro render_toasts() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="fixed bottom-5 right-5 z-50 space-y-4">
+    {% for category, message in messages %}
+    {% set toast_id = 'toast-' ~ loop.index %}
+
+    {# Default styling if no category is specified #}
+    {% set icon_bg = 'text-blue-500 bg-blue-100 dark:bg-blue-800 dark:text-blue-200' %}
+    {% set icon_path = 'M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0
+    0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z' %}
+    {% set sr_text = 'Notification' %}
+
+    {# Set styles based on message category #}
+    {% if category == 'success' %}
+    {% set icon_bg = 'text-green-500 bg-green-100 dark:bg-green-800 dark:text-green-200' %}
+    {% set icon_path = 'M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0
+    0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z' %}
+    {% set sr_text = 'Success notification' %}
+    {% elif category == 'error' or category == 'danger' %}
+    {% set icon_bg = 'text-red-500 bg-red-100 dark:bg-red-800 dark:text-red-200' %}
+    {% set icon_path = 'M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10
+    11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1
+    1.414 1.414L11.414 10l2.293 2.293Z' %}
+    {% set sr_text = 'Error notification' %}
+    {% elif category == 'warning' %}
+    {% set icon_bg = 'text-orange-500 bg-orange-100 dark:bg-orange-700 dark:text-orange-200' %}
+    {% set icon_path = 'M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0
+    0 1-2 0V6a1 1 0 0 1 2 0v5Z' %}
+    {% set sr_text = 'Warning notification' %}
+    {% endif %}
+
+    <div id="{{ toast_id }}"
+         class="relative flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800 transition-opacity duration-300"
+         role="alert">
+        <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 {{ icon_bg }} rounded-lg">
+            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                 viewBox="0 0 20 20">
+                <path d="{{ icon_path }}"/>
+            </svg>
+            <span class="sr-only">{{ sr_text }}</span>
+        </div>
+        <div class="ms-3 text-sm font-normal pe-8">{{ message }}</div>
+        <button type="button"
+                class="absolute right-2 bg-gray-100 text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-200 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-700 dark:hover:bg-gray-600"
+                data-dismiss-target="#{{ toast_id }}" aria-label="Close">
+            <span class="sr-only">Close</span>
+            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+            </svg>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+{% endmacro %}

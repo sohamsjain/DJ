@@ -1,0 +1,182 @@
+{% extends "shell.html" %}
+
+{% block page %}
+<div class="container mx-auto px-4 py-8">
+    <div class="px-4 mx-auto max-w-screen-2xl lg:px-12 mb-8">
+        <div class="flex items-center gap-3 mb-6">
+            <a href="{{ request.referrer }}"
+               class="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back
+            </a>
+        </div>
+
+        <!-- User Earning Details Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-3">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        Earning Details
+                    </h1>
+                    <p class="text-gray-500 dark:text-gray-400">
+                        {{ user_earning.earning.start_date.strftime('%b %d') }} - {{ user_earning.earning.end_date.strftime('%b %d, %Y') }}
+                    </p>
+                </div>
+                <span class="px-3 py-1.5 text-sm font-medium whitespace-nowrap
+                    {% if user_earning.status == 'Draft' %}
+                    text-gray-300 bg-gray-900
+                    {% elif user_earning.status == 'Settlement pending' %}
+                    text-yellow-500 bg-yellow-900
+                    {% else %}
+                    text-green-300 bg-green-900
+                    {% endif %} rounded">
+                    {{ user_earning.status }}
+                </span>
+            </div>
+
+            <div class="grid gap-6 mb-3 md:grid-cols-3">
+                <!-- User Card -->
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">User Information</h2>
+                    <dl class="space-y-3">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Username:</dt>
+                            <dd class="text-lg font-bold text-gray-900 dark:text-white">{{ user_earning.user.username }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Email:</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ user_earning.user.email }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Earning Type:</dt>
+                            <dd>
+                                <span class="px-2 py-1 text-sm font-medium rounded inline-block mt-1
+                                    {% if user_earning.earning_type == 'Fixed' %}
+                                    text-red-300 bg-red-900
+                                    {% else %}
+                                    text-green-300 bg-green-900
+                                    {% endif %}">
+                                    {{ user_earning.earning_type }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Current Balance:</dt>
+                            <dd class="text-lg font-bold text-gray-900 dark:text-white">${{ "%.2f"|format(user_earning.user.balance) }}</dd>
+                        </div>
+                    </dl>
+                </div>
+                
+                <!-- Earning Details -->
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Earning Details</h2>
+                    <dl class="space-y-3">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Period:</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                                {{ user_earning.earning.start_date.strftime('%b %d') }} - {{ user_earning.earning.end_date.strftime('%b %d, %Y') }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Applied Percentage:</dt>
+                            <dd class="text-lg font-bold text-gray-900 dark:text-white">{{ "%.2f"|format(user_earning.percentage) }}%</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Days in Period:</dt>
+                            <dd class="text-lg font-medium text-gray-900 dark:text-white">{{ days|length }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status:</dt>
+                            <dd>
+                                <span class="px-2 py-1 text-sm font-medium rounded inline-block mt-1
+                                    {% if user_earning.status == 'Draft' %}
+                                    text-gray-300 bg-gray-900
+                                    {% elif user_earning.status == 'Settlement pending' %}
+                                    text-yellow-500 bg-yellow-900
+                                    {% else %}
+                                    text-green-300 bg-green-900
+                                    {% endif %}">
+                                    {{ user_earning.status }}
+                                </span>
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+                
+                <!-- Total Earning -->
+                <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-6">
+                    <h2 class="text-lg font-semibold text-blue-700 dark:text-blue-300 mb-4">Total Earning</h2>
+                    <div class="flex flex-col items-center justify-center h-[calc(100%-2rem)]">
+                        <p class="text-sm font-medium text-blue-700 dark:text-blue-300">Total Amount</p>
+                        <p class="text-5xl font-bold text-blue-700 dark:text-blue-300">${{ "%.2f"|format(user_earning.total_amount) }}</p>
+                        
+                        {% if user_earning.status == 'Complete' and user_earning.completed_at %}
+                        <div class="mt-6 text-center">
+                            <p class="text-sm font-medium text-blue-700 dark:text-blue-300">Distributed On</p>
+                            <p class="text-lg font-bold text-blue-700 dark:text-blue-300">{{ user_earning.completed_at_est }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Earnings Table -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Daily Balances & Earnings</h2>
+            
+            <div class="overflow-x-auto">
+                <table id="days-table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Date</th>
+                            <th scope="col" class="px-6 py-3">Closing Balance</th>
+                            <th scope="col" class="px-6 py-3">Percentage Applied</th>
+                            <th scope="col" class="px-6 py-3">Daily Earning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for day in days %}
+                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{ day.date.strftime('%b %d, %Y') }}
+                            </th>
+                            <td class="px-6 py-4">${{ "%.2f"|format(day.closing_balance) }}</td>
+                            <td class="px-6 py-4">{{ "%.4f"|format(day.percentage_applied) }}%</td>
+                            <td class="px-6 py-4 font-medium text-green-600 dark:text-green-500">${{ "%.2f"|format(day.daily_earning) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-semibold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700">
+                            <th scope="row" class="px-6 py-3 text-base">Total</th>
+                            <td class="px-6 py-3">-</td>
+                            <td class="px-6 py-3">{{ "%.2f"|format(user_earning.percentage) }}%</td>
+                            <td class="px-6 py-3">${{ "%.2f"|format(user_earning.total_amount) }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Initialize DataTable if it exists
+        if (document.getElementById("days-table") && typeof simpleDatatables !== 'undefined') {
+            const dataTable = new simpleDatatables.DataTable("#days-table", {
+                searchable: false,
+                sortable: false,
+                paging: false,
+                perPage: 31,
+            });
+        }
+    });
+</script>
+{% endblock %}

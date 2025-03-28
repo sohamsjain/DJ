@@ -1,0 +1,311 @@
+{% extends "shell.html" %}
+
+{% block page %}
+<div class="container mx-auto px-4 py-8">
+    <div class="px-4 mx-auto max-w-screen-2xl lg:px-12 mb-8">
+        <div class="flex items-center gap-3 mb-6">
+            <a href="{{ url_for('main.earnings') }}"
+               class="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Earnings List
+            </a>
+        </div>
+
+        <!-- Earnings Period Details Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        Earnings Period: {{ earning.start_date.strftime('%b %d') }} - {{ earning.end_date.strftime('%b
+                        %d, %Y') }}
+                    </h1>
+                    <p class="text-gray-500 dark:text-gray-400">
+                        Created by {{ earning.created_by.username }} on {{ earning.created_at_est }}
+                    </p>
+                </div>
+                <span class="px-3 py-1.5 text-sm font-medium whitespace-nowrap
+                    {% if earning.status == 'Pending' %}text-yellow-500 bg-yellow-900
+                    {% else %}text-green-300 bg-green-900
+                    {% endif %} rounded">
+                    {{ earning.status }}
+                </span>
+            </div>
+
+            <div class="grid gap-6 mb-8 md:grid-cols-2">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Period Information</h2>
+                    <dl class="max-w-md space-y-4 text-gray-900 dark:text-white">
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Start Date:</dt>
+                            <dd class="text-sm">{{ earning.start_date_est }}</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">End Date:</dt>
+                            <dd class="text-sm">{{ earning.end_date_est }}</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Days in Period:</dt>
+                            <dd class="text-sm">{{ earning.days_in_period }}</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Total Fixed
+                                Earnings:
+                            </dt>
+                            <dd class="text-sm font-semibold">${{ "%.2f"|format(fixed_total) }}</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Total Variable
+                                Earnings:
+                            </dt>
+                            <dd class="text-sm font-semibold">${{ "%.2f"|format(variable_total) }}</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Grand Total:</dt>
+                            <dd class="text-sm font-semibold">${{ "%.2f"|format(grand_total) }}</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Percentages</h2>
+                    {% if earning.status == 'Pending' %}
+                    <form method="POST" action="{{ url_for('main.update_earning', id=earning.id) }}">
+                        {{ update_form.hidden_tag() }}
+
+                        <div class="grid gap-6 mb-6 md:grid-cols-2">
+                            <div>
+                                <label for="{{ update_form.fixed_percentage.id }}"
+                                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ update_form.fixed_percentage.label }}
+                                </label>
+                                <div class="relative">
+                                    {{ update_form.fixed_percentage(class="bg-gray-50 border border-gray-300
+                                    text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block
+                                    w-full p-2.5 pr-8 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+                                    dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500") }}
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <span class="text-gray-500 dark:text-gray-400">%</span>
+                                    </div>
+                                </div>
+                                {% if update_form.fixed_percentage.errors %}
+                                {% for error in update_form.fixed_percentage.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ error }}</p>
+                                {% endfor %}
+                                {% endif %}
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Applied to Fixed users</p>
+                            </div>
+                            <div>
+                                <label for="{{ update_form.variable_percentage.id }}"
+                                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ update_form.variable_percentage.label }}
+                                </label>
+                                <div class="relative">
+                                    {{ update_form.variable_percentage(class="bg-gray-50 border border-gray-300
+                                    text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block
+                                    w-full p-2.5 pr-8 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+                                    dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500") }}
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <span class="text-gray-500 dark:text-gray-400">%</span>
+                                    </div>
+                                </div>
+                                {% if update_form.variable_percentage.errors %}
+                                {% for error in update_form.variable_percentage.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ error }}</p>
+                                {% endfor %}
+                                {% endif %}
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Applied to Variable users</p>
+                            </div>
+                        </div>
+
+                        {{ update_form.submit(class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4
+                        focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center
+                        dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800") }}
+                    </form>
+                    {% else %}
+                    <dl class="max-w-md space-y-4 text-gray-900 dark:text-white">
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Fixed Percentage:</dt>
+                            <dd class="text-sm">
+                                <span class="px-2 py-1 text-xs font-medium whitespace-nowrap bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 rounded">
+                                    {{ "%.2f"|format(earning.fixed_percentage) }}%
+                                </span>
+                            </dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Variable Percentage:
+                            </dt>
+                            <dd class="text-sm">
+                                <span class="px-2 py-1 text-xs font-medium whitespace-nowrap bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded">
+                                    {{ "%.2f"|format(earning.variable_percentage) }}%
+                                </span>
+                            </dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Daily Fixed:</dt>
+                            <dd class="text-sm">{{ "%.4f"|format(earning.daily_fixed_percentage) }}%</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Daily Variable:</dt>
+                            <dd class="text-sm">{{ "%.4f"|format(earning.daily_variable_percentage) }}%</dd>
+                        </div>
+                    </dl>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- User Earnings Table -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">User Earnings</h2>
+
+            <div class="overflow-x-auto">
+                <table id="user-earnings-table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Username</th>
+                        <th scope="col" class="px-6 py-3">Email</th>
+                        <th scope="col" class="px-6 py-3">Type</th>
+                        <th scope="col" class="px-6 py-3">Percentage</th>
+                        <th scope="col" class="px-6 py-3">Amount</th>
+                        <th scope="col" class="px-6 py-3">Status</th>
+                        <th scope="col" class="px-6 py-3">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user_earning in user_earnings %}
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                            {{ user_earning.user.username }}
+                        </th>
+                        <td class="px-6 py-4">{{ user_earning.user.email }}</td>
+                        <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium rounded
+                                    {% if user_earning.earning_type == 'Fixed' %}
+                                    text-red-300 bg-red-900
+                                    {% else %}
+                                    text-green-300 bg-green-900
+                                    {% endif %}">
+                                    {{ user_earning.earning_type }}
+                                </span>
+                        </td>
+                        <td class="px-6 py-4">{{ "%.2f"|format(user_earning.percentage) }}%</td>
+                        <td class="px-6 py-4 font-medium">${{ "%.2f"|format(user_earning.total_amount) }}</td>
+                        <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium rounded whitespace-nowrap
+                                    {% if user_earning.status == 'Draft' %}
+                                    text-gray-300 bg-gray-900
+                                    {% elif user_earning.status == 'Settlement pending' %}
+                                    text-yellow-500 bg-yellow-900
+                                    {% elif user_earning.status == 'Complete' %}
+                                    text-green-300 bg-green-900
+                                    {% endif %}">
+                                    {{ user_earning.status }}
+                                </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <a href="{{ url_for('main.userearning', id=user_earning.id) }}"
+                               class="font-medium text-blue-600 dark:text-blue-500 hover:underline whitespace-nowrap">View
+                                Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Approvals Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Approvals</h2>
+
+            {% if earning.approvals %}
+            <div class="overflow-x-auto mb-6">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Admin</th>
+                        <th scope="col" class="px-6 py-3">Status</th>
+                        <th scope="col" class="px-6 py-3">Date</th>
+                        <th scope="col" class="px-6 py-3">Notes</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for approval in earning.approvals %}
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                            {{ approval.admin.username }}
+                        </th>
+                        <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium rounded
+                                    {% if approval.approved %}text-green-300 bg-green-900{% else %}text-red-300 bg-red-900{% endif %}">
+                                    {% if approval.approved %}Approved{% else %}Rejected{% endif %}
+                                </span>
+                        </td>
+                        <td class="px-6 py-4">{{ approval.created_at_est }}</td>
+                        <td class="px-6 py-4">{{ approval.notes or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="mb-6 text-gray-500 dark:text-gray-400">No approvals yet</div>
+            {% endif %}
+
+            <!-- Approval Form (only show for admins if earning is pending) -->
+            {% if earning.status == 'Pending' and current_user.is_admin %}
+
+            {% if not current_user_has_approved %}
+            <div class="grid gap-6 mb-6 md:grid-cols-1">
+                <form method="POST" action="{{ url_for('main.approve_earning', id=earning.id) }}">
+                    {{ approval_form.hidden_tag() }}
+                    <div class="mb-4">
+                        <label for="{{ approval_form.notes.id }}"
+                               class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Approval Notes (Optional)
+                        </label>
+                        {{ approval_form.notes(rows=3, class="bg-gray-50 border border-gray-300 text-gray-900 text-sm
+                        rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700
+                        dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500
+                        dark:focus:border-blue-500", placeholder="Enter approval notes") }}
+                        {% if approval_form.notes.errors %}
+                        {% for error in approval_form.notes.errors %}
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ error }}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="flex justify-end">
+                        {{ approval_form.approve(class="text-white bg-green-700 hover:bg-green-800 focus:ring-4
+                        focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center
+                        dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800") }}
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Initialize DataTable if it exists
+        if (document.getElementById("user-earnings-table") && typeof simpleDatatables !== 'undefined') {
+            const dataTable = new simpleDatatables.DataTable("#user-earnings-table", {
+                searchable: true,
+                sortable: true,
+                paging: false,
+                perPage: 100,
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

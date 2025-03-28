@@ -1,0 +1,639 @@
+{% extends "shell.html" %}
+
+{% block page %}
+<div class="container mx-auto px-4 py-8">
+    <div class="px-4 mx-auto max-w-screen-2xl lg:px-12 mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">{{ user.username }}</h1>
+            <h2 class="text-lg text-gray-500 dark:text-gray-300 mb-3">Email: {{ user.email }}</h2>
+            <h2 class="text-lg text-gray-500 dark:text-gray-300 mb-3">Member Since: {{ user.created_at_est }}</h2>
+            <span class="px-2.5 py-0.5 text-lg font-medium rounded
+                {% if user.earning_type == 'Fixed' %}
+                    bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300
+                {% else %}
+                    bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300
+                {% endif %}">
+                {{ user.earning_type }}
+            </span>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('main.deposit', id=user.id) }}"
+               class="px-4 py-2 text-sm font-medium bg-green-100 text-green-800 hover:bg-green-700 rounded-lg focus:ring-4 focus:ring-green-300 dark:focus:ring-green-900 dark:bg-green-900 dark:text-green-500">
+                Add Funds
+            </a>
+            <a href="{{ url_for('main.withdraw', id=user.id) }}"
+               class="px-4 py-2 text-sm font-medium bg-red-100 text-red-800 hover:bg-red-700 rounded-lg focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900 dark:bg-red-900 dark:text-red-500">
+                Withdraw Funds
+            </a>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="px-4 max-w-screen-2xl lg:px-12 mb-6 border-b border-gray-200 dark:border-gray-700">
+        <ul class="flex flex-wrap">
+            <li class="mr-2">
+                <a href="{{ url_for('main.user', id=user.id, tab='summary') }}"
+                   class="inline-block py-4 px-4 text-lg font-medium text-center rounded-t-lg border-b-4 text-gray-300 {% if active_tab == 'summary' %}text-blue-600 border-blue-600 dark:text-gray-300 dark:border-gray-300{% else %}border-transparent hover:text-gray-300 hover:border-gray-300 dark:hover:text-gray-300 dark:hover:text-border-300{% endif %}">
+                    Summary
+                </a>
+            </li>
+            <li class="mr-2">
+                <a href="{{ url_for('main.user', id=user.id, tab='earnings') }}"
+                   class="inline-block py-4 px-4 text-lg font-medium text-center rounded-t-lg border-b-4 text-gray-300 {% if active_tab == 'earnings' %}text-blue-600 border-blue-600 dark:text-gray-300 dark:border-gray-300{% else %}border-transparent hover:text-gray-300 hover:border-gray-300 dark:hover:text-gray-300 dark:hover:text-border-300{% endif %}">
+                    Earnings
+                </a>
+            </li>
+            <li class="mr-2">
+                <a href="{{ url_for('main.user', id=user.id, tab='transactions') }}"
+                   class="inline-block py-4 px-4 text-lg font-medium text-center rounded-t-lg border-b-4 text-gray-300 {% if active_tab == 'transactions' %}text-blue-600 border-blue-600 dark:text-gray-300 dark:border-gray-300{% else %}border-transparent hover:text-gray-300 hover:border-gray-300 dark:hover:text-gray-300 dark:hover:text-border-300{% endif %}">
+                    Transactions
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content max-w-screen-2xl lg:px-12">
+        <!-- Summary Tab -->
+        <div class="tab-pane {% if active_tab == 'summary' %}block{% else %}hidden{% endif %}">
+            <!-- Statistics Grid -->
+            <div class="mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Total Balance Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-purple-900 rounded-full p-3 mr-4">
+                                <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Balance</h3>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">${{
+                                    "%.2f"|format(user.balance) }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deposits Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-green-900 rounded-full p-3 mr-4">
+                                <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M7 11l5-5m0 0l5 5m-5-5v12"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Deposits</h3>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">${{
+                                    "%.2f"|format(statistics.total_deposits) }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Withdrawals Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-red-900 rounded-full p-3 mr-4">
+                                <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M17 13l-5 5m0 0l-5-5m5 5V6"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Withdrawals</h3>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">${{
+                                    "%.2f"|format(statistics.total_withdrawals) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Total Earnings Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-purple-900 rounded-full p-3 mr-4">
+                                <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Earnings</h3>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">${{
+                                    "%.2f"|format(statistics.total_earnings) }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paid Earnings Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-green-900 rounded-full p-3 mr-4">
+                                <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Paid Earnings</h3>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">${{
+                                    "%.2f"|format(statistics.earnings_paid) }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Unpaid Earnings Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-red-900 rounded-full p-3 mr-4">
+                                <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Unpaid Earnings</h3>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">${{
+                                    "%.2f"|format(statistics.earnings_unpaid) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Transactions -->
+            {% if pending_transactions %}
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold mb-4 dark:text-white">Pending Transactions</h2>
+                <div class="overflow-x-auto">
+                    <table id="pending-transactions-table">
+                        <thead>
+                        <tr>
+                            <th>
+                                    <span class="flex items-center">
+                                        Date
+                                        <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                             width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                  stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                        </svg>
+                                    </span>
+                            </th>
+                            <th>
+                                    <span class="flex items-center">
+                                        Transaction Type
+                                        <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                             width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                  stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                        </svg>
+                                    </span>
+                            </th>
+                            <th>
+                                    <span class="flex items-center">
+                                        Description
+                                        <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                             width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                  stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                        </svg>
+                                    </span>
+                            </th>
+                            <th class="text-right">
+                                    <span class="flex items-center">
+                                        Amount
+                                        <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                             width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                  stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                        </svg>
+                                    </span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for transaction in pending_transactions %}
+                        <tr class="hover:bg-gray-800 cursor-pointer"
+                            data-href="{{ url_for('main.transaction', id=transaction.id) }}">
+                            <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">{{
+                                transaction.created_at_est }}
+                            </td>
+                            <td>
+                                    <span class="px-2 py-1 text-sm font-medium whitespace-nowrap
+                                        {% if transaction.type == 'Deposit' %}text-green-300 bg-green-900
+                                        {% elif transaction.type == 'Withdrawal' %}text-red-300 bg-red-900
+                                        {% elif transaction.type == 'Earnings' %}text-blue-300 bg-blue-900
+                                        {% endif %} rounded">
+                                        {{ transaction.type }}
+                                    </span>
+                            </td>
+                            <td class="font-medium text-lg text-gray-900 dark:text-gray-400">{{
+                                transaction.description }}
+                            </td>
+                            <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-white text-right">
+                                    <span class="{% if transaction.type == 'Withdrawal' %}text-red-800{% else %}text-green-800{% endif %}">
+                                        {% if transaction.type == 'Withdrawal' %}-{% else %}+{% endif %}${{ "%.2f"|format(transaction.amount|abs) }}
+                                    </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Unpaid Earnings -->
+            {% if unpaid_earnings %}
+            <div>
+                <div class="flex justify-between">
+                <h2 class="text-xl font-semibold mb-4 dark:text-white">Unpaid Earnings</h2>
+                {% if current_user.is_admin %}
+                <div>
+                    <a href="{{ url_for('main.settle', id=user.id) }}"
+                       class="px-4 py-2 text-sm font-medium bg-green-100 text-green-800 hover:bg-green-700 rounded-lg focus:ring-4 focus:ring-green-300 dark:focus:ring-green-900 dark:bg-green-900 dark:text-green-500">
+                        Settle Earnings
+                    </a>
+                </div>
+                {% endif %}
+                </div>
+                <div class="overflow-x-auto">
+                    <table id="unpaid-earnings-table">
+                        <thead>
+                        <tr>
+                            <th>
+                                <span class="flex items-center">
+                                    From
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                            </th>
+                            <th>
+                                <span class="flex items-center">
+                                    From
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                            </th>
+                            <th>
+                                <span class="flex items-center">
+                                    Earnings Type
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                            </th>
+                            <th>
+                                <span class="flex items-center">
+                                    Status
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                            </th>
+                            <th class="text-right">
+                                <span class="flex items-center">
+                                    Percentage
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                            </th>
+                            <th class="text-right">
+                                <span class="flex items-center">
+                                    Amount
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for user_earning in unpaid_earnings %}
+                        <tr class="hover:bg-gray-800 cursor-pointer"
+                            data-href="{{ url_for('main.userearning', id=user_earning.id) }}">
+                            <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">{{
+                                user_earning.earning.start_date_est }}
+                            </td>
+                            <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">{{
+                                user_earning.earning.end_date_est }}
+                            </td>
+                            <td>
+                                <span class="px-2 py-1 text-sm font-medium whitespace-nowrap
+                                    {% if user_earning.earning_type == 'Variable' %}text-green-300 bg-green-900
+                                    {% elif user_earning.earning_type == 'Fixed' %}text-red-300 bg-red-900
+                                    {% endif %} rounded">
+                                    {{ user_earning.earning_type }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="px-2 py-1 text-sm font-medium whitespace-nowrap
+                                    {% if user_earning.status == 'Draft' %}text-gray-300 bg-gray-900
+                                    {% elif user_earning.status == 'Settlement pending' %}text-yellow-500 bg-yellow-900
+                                    {% elif user_earning.status == 'Complete' %}text-green-300 bg-green-900
+                                    {% endif %} rounded">
+                                    {{ user_earning.status }}
+                                </span>
+                            </td>
+                            <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-white text-right">
+                                <span class="text-gray-900 dark:text-gray-400">
+                                    {{ "%.2f"|format(user_earning.percentage|abs) }}%
+                                </span>
+                            </td>
+                            <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-white text-right">
+                                <span class="text-gray-900 dark:text-gray-400">
+                                    ${{ "%.2f"|format(user_earning.total_amount|abs) }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Earnings Tab -->
+        <div class="tab-pane {% if active_tab == 'earnings' %}block{% else %}hidden{% endif %}">
+            <h2 class="text-xl font-semibold mb-4 dark:text-white">Earnings History</h2>
+            {% if user_earnings %}
+            <div class="overflow-x-auto">
+                <table id="earnings-table">
+                    <thead>
+                    <tr>
+                        <th>
+                                <span class="flex items-center">
+                                    From
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                        </th>
+                        <th>
+                                <span class="flex items-center">
+                                    From
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                        </th>
+                        <th>
+                                <span class="flex items-center">
+                                    Earnings Type
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                        </th>
+                        <th>
+                                <span class="flex items-center">
+                                    Status
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                        </th>
+                        <th class="text-right">
+                                <span class="flex items-center">
+                                    Percentage
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                        </th>
+                        <th class="text-right">
+                                <span class="flex items-center">
+                                    Amount
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user_earning in user_earnings %}
+                    <tr class="hover:bg-gray-800 cursor-pointer"
+                        data-href="{{ url_for('main.userearning', id=user_earning.id) }}">
+                        <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">{{
+                            user_earning.earning.start_date_est }}
+                        </td>
+                        <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">{{
+                            user_earning.earning.end_date_est }}
+                        </td>
+                        <td>
+                                <span class="px-2 py-1 text-sm font-medium whitespace-nowrap
+                                    {% if user_earning.earning_type == 'Variable' %}text-green-300 bg-green-900
+                                    {% elif user_earning.earning_type == 'Fixed' %}text-red-300 bg-red-900
+                                    {% endif %} rounded">
+                                    {{ user_earning.earning_type }}
+                                </span>
+                        </td>
+                        <td>
+                                <span class="px-2 py-1 text-sm font-medium whitespace-nowrap
+                                    {% if user_earning.status == 'Draft' %}text-gray-300 bg-gray-700
+                                    {% elif user_earning.status == 'Settlement pending' %}text-yellow-500 bg-yellow-900
+                                    {% elif user_earning.status == 'Complete' %}text-green-300 bg-green-900
+                                    {% endif %} rounded">
+                                    {{ user_earning.status }}
+                                </span>
+                        </td>
+                        <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-white text-right">
+                                <span class="text-gray-900 dark:text-gray-400">
+                                    {{ "%.2f"|format(user_earning.percentage|abs) }}%
+                                </span>
+                        </td>
+                        <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-white text-right">
+                                <span class="text-gray-900 dark:text-gray-400">
+                                    ${{ "%.2f"|format(user_earning.total_amount|abs) }}
+                                </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-gray-500 dark:text-gray-400">No earnings records found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Transactions Tab -->
+        <div class="tab-pane {% if active_tab == 'transactions' %}block{% else %}hidden{% endif %}">
+            <h2 class="text-xl font-semibold mb-4 dark:text-white">Transaction History</h2>
+
+            {% if transactions %}
+            <div class="overflow-x-auto">
+                <table id="transactions-table">
+                    <thead>
+                    <tr>
+                        <th>
+                                <span class="flex items-center">
+                                    Date
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                        </th>
+                        <th>
+                                <span class="flex items-center">
+                                    Transaction Type
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                        </th>
+                        <th>
+                                <span class="flex items-center">
+                                    Status
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                        </th>
+                        <th class="text-right">
+                                <span class="flex items-center">
+                                    Amount
+                                    <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                                    </svg>
+                                </span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for transaction in transactions %}
+                    <tr class="hover:bg-gray-800 cursor-pointer"
+                        data-href="{{ url_for('main.transaction', id=transaction.id) }}">
+                        <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">{{
+                            transaction.created_at_est }}
+                        </td>
+                        <td>
+                                <span class="px-2 py-1 text-sm font-medium whitespace-nowrap
+                                    {% if transaction.type == 'Deposit' %}text-green-300 bg-green-900
+                                    {% elif transaction.type == 'Withdrawal' %}text-red-300 bg-red-900
+                                    {% elif transaction.type == 'Earnings' %}text-blue-300 bg-blue-900
+                                    {% endif %} rounded">
+                                    {{ transaction.type }}
+                                </span>
+                        </td>
+                        <td>
+                                <span class="px-2 py-1 text-sm font-medium whitespace-nowrap
+                                    {% if transaction.status == 'Approval pending' %}text-yellow-500 bg-yellow-900
+                                    {% elif transaction.status == 'Complete' %}text-green-300 bg-green-900
+                                    {% elif transaction.status == 'Rejected' %}text-red-300 bg-red-900
+                                    {% endif %} rounded">
+                                    {{ transaction.status }}
+                                </span>
+                        </td>
+                        <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-white text-right">
+                                <span class="{% if transaction.type == 'Withdrawal' %}text-red-800{% else %}text-green-800{% endif %}">
+                                    {% if transaction.type == 'Withdrawal' %}-{% else %}+{% endif %}${{ "%.2f"|format(transaction.amount|abs) }}
+                                </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-gray-500 dark:text-gray-400">No transaction history found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
+<script>
+    if (document.getElementById("pending-transactions-table") && typeof simpleDatatables.DataTable !== 'undefined') {
+        const dataTable = new simpleDatatables.DataTable("#pending-transactions-table", {
+            searchable: false,
+            sortable: true,
+            paging: false,
+        });
+    }
+
+    if (document.getElementById("unpaid-earnings-table") && typeof simpleDatatables.DataTable !== 'undefined') {
+        const dataTable = new simpleDatatables.DataTable("#unpaid-earnings-table", {
+            searchable: false,
+            sortable: true,
+            paging: false,
+        });
+    }
+
+    if (document.getElementById("transactions-table") && typeof simpleDatatables.DataTable !== 'undefined') {
+        const dataTable = new simpleDatatables.DataTable("#transactions-table", {
+            searchable: true,
+            sortable: true,
+            paging: true,
+            perPage: 10,
+            perPageSelect: [5, 10],
+        });
+    }
+
+    if (document.getElementById("earnings-table") && typeof simpleDatatables.DataTable !== 'undefined') {
+        const dataTable = new simpleDatatables.DataTable("#earnings-table", {
+            searchable: true,
+            sortable: true,
+            paging: true,
+            perPage: 10,
+            perPageSelect: [5, 10],
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Make rows clickable for navigation to transaction details
+        const rows = document.querySelectorAll("tr[data-href]");
+        rows.forEach(row => {
+            row.addEventListener("click", function() {
+                window.location.href = this.dataset.href;
+            });
+        });
+    });
+</script>
+{% endblock %}

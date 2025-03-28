@@ -1,0 +1,136 @@
+{% extends "shell.html" %}
+
+{% block styles %}
+{% endblock %}
+
+{% block page %}
+<div class="container mx-auto px-4 py-8">
+    <div class="px-4 mx-auto max-w-screen-2xl lg:px-12 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-semibold text-gray-900 dark:text-white">Transactions</h1>
+        </div>
+    </div>
+    <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700">
+    <div class="px-4 mx-auto max-w-screen-2xl lg:px-12">
+        <div class="relative overflow-x-auto">
+            <table id="default-table">
+                <thead>
+                <tr>
+                    <th>
+                        <span class="flex items-center">
+                            Date
+                            <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                            </svg>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="flex items-center">
+                            Name
+                            <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                            </svg>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="flex items-center">
+                            Transaction Type
+                            <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                            </svg>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="flex items-center">
+                            Status
+                            <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                            </svg>
+                        </span>
+                    </th>
+                    <th class="text-right">
+                        <span class="flex items-center">
+                            Amount
+                            <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                            </svg>
+                        </span>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for transaction in transactions %}
+                <tr class="hover:bg-gray-800 cursor-pointer"
+                    data-href="{{ url_for('main.transaction', id=transaction.id) }}">
+                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">{{
+                        transaction.created_at_est }}
+                    </td>
+                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">{{
+                        transaction.user.username }}
+                    </td>
+                    <td>
+                        <span class="px-2 py-1 text-sm font-medium whitespace-nowrap
+                            {% if transaction.type == 'Deposit' %}text-green-300 bg-green-900
+                            {% elif transaction.type == 'Withdrawal' %}text-red-300 bg-red-900
+                            {% elif transaction.type == 'Earnings' %}text-blue-300 bg-blue-900
+                            {% endif %} rounded">
+                            {{ transaction.type }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="px-2 py-1 text-sm font-medium whitespace-nowrap
+                            {% if transaction.status == 'Approval pending' %}text-yellow-500 bg-yellow-900
+                            {% elif transaction.status == 'Complete' %}text-green-300 bg-green-900
+                            {% elif transaction.status == 'Rejected' %}text-red-300 bg-red-900
+                            {% endif %} rounded">
+                            {{ transaction.status }}
+                        </span>
+                    </td>
+                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-white text-right">
+                        <span class="{% if transaction.type == 'Withdrawal' %}text-red-800{% else %}text-green-800{% endif %}">
+                            {% if transaction.type == 'Withdrawal' %}-{% else %}+{% endif %}${{ "%.2f"|format(transaction.amount|abs) }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
+<script>
+    if (document.getElementById("default-table") && typeof simpleDatatables.DataTable !== 'undefined') {
+        const dataTable = new simpleDatatables.DataTable("#default-table", {
+            searchable: true,
+            sortable: true,
+            paging: true,
+            perPage: 10,
+            perPageSelect: [5, 10],
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Make rows clickable for navigation to transaction details
+        const rows = document.querySelectorAll("tr[data-href]");
+        rows.forEach(row => {
+            row.addEventListener("click", function() {
+                window.location.href = this.dataset.href;
+            });
+        });
+    });
+</script>
+{% endblock %}

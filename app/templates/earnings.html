@@ -1,0 +1,130 @@
+{% extends "shell.html" %}
+
+{% block page %}
+<div class="container mx-auto px-4 py-8">
+    <div class="px-4 mx-auto max-w-screen-2xl lg:px-12 mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">Earnings Periods</h1>
+            <p class="text-lg text-gray-500 dark:text-gray-300">Manage and distribute user earnings</p>
+        </div>
+        <div>
+            <a href="{{ url_for('main.create_earning') }}"
+               class="px-4 py-2 text-sm font-medium text-green-300 bg-green-700 hover:bg-green-800 rounded-lg focus:ring-4 focus:ring-green-300 dark:text-green-300 dark:bg-green-900 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                Issue Earnings
+            </a>
+        </div>
+    </div>
+    <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700">
+    <div class="px-4 mx-auto max-w-screen-2xl lg:px-12">
+        <div class="relative overflow-x-auto">
+            <table id="default-table">
+                <thead>
+                <tr>
+                    <th>
+                        <span class="flex items-center">
+                            Period
+                            <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                            </svg>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="flex items-center">
+                            Created By
+                            <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                            </svg>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="flex items-center">
+                            Status
+                            <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                            </svg>
+                        </span>
+                    </th>
+                    <th class="text-right">
+                        <span class="flex items-center">
+                            Fixed %
+                            <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                            </svg>
+                        </span>
+                    </th>
+                    <th class="text-right">
+                        <span class="flex items-center">
+                            Variable %
+                            <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+                            </svg>
+                        </span>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for earning in earnings %}
+                <tr class="hover:bg-gray-800 cursor-pointer"
+                    data-href="{{ url_for('main.earning', id=earning.id) }}">
+                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">
+                        {{ earning.start_date.strftime('%b %d') }} - {{ earning.end_date.strftime('%b %d, %Y') }}
+                    </td>
+                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">
+                        {{ earning.created_by.username }}
+                    </td>
+                    <td>
+                        <span class="px-2 py-1 text-sm font-medium whitespace-nowrap
+                            {% if earning.status == 'Pending' %}text-red-300 bg-red-900
+                            {% elif earning.status == 'Approved' %}text-green-300 bg-green-900
+                            {% endif %} rounded">
+                            {{ earning.status }}
+                        </span>
+                    </td>
+                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400 text-right">
+                        {{ "%.2f"|format(earning.fixed_percentage) }}%
+                    </td>
+                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400 text-right">
+                        {{ "%.2f"|format(earning.variable_percentage) }}%
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
+<script>
+    if (document.getElementById("default-table") && typeof simpleDatatables.DataTable !== 'undefined') {
+        const dataTable = new simpleDatatables.DataTable("#default-table", {
+            searchable: true,
+            sortable: true,
+            paging: true,
+            perPage: 10,
+            perPageSelect: [5, 10],
+        });
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+        // Make rows clickable for navigation to transaction details
+        const rows = document.querySelectorAll("tr[data-href]");
+        rows.forEach(row => {
+            row.addEventListener("click", function() {
+                window.location.href = this.dataset.href;
+            });
+        });
+    });
+</script>
+{% endblock %}

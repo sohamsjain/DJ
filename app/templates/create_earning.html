@@ -1,0 +1,95 @@
+{% extends "shell.html" %}
+
+{% block page %}
+<div class="container mx-auto px-4 py-8">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-12 mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create Earning Period</h1>
+            <a href="{{ url_for('main.earnings') }}"
+               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                Back to List
+            </a>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+            <form method="POST" action="{{ url_for('main.create_earning') }}">
+                {{ form.hidden_tag() }}
+                <div class="grid gap-6 mb-6 md:grid-cols-2">
+                    <div>
+                        <label for="{{ form.year.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            {{ form.year.label }}
+                        </label>
+                        {{ form.year(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500") }}
+                        {% if form.year.errors %}
+                            {% for error in form.year.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="{{ form.month.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            {{ form.month.label }}
+                        </label>
+                        {{ form.month(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500") }}
+                        {% if form.month.errors %}
+                            {% for error in form.month.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="grid gap-6 mb-6 md:grid-cols-2">
+                    <div>
+                        <label for="{{ form.fixed_percentage.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            {{ form.fixed_percentage.label }}
+                        </label>
+                        <div class="relative">
+                            {{ form.fixed_percentage(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500") }}
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-gray-500 dark:text-gray-400">%</span>
+                            </div>
+                        </div>
+                        {% if form.fixed_percentage.errors %}
+                            {% for error in form.fixed_percentage.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Applied to users with Fixed earning type</p>
+                    </div>
+                    <div>
+                        <label for="{{ form.variable_percentage.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            {{ form.variable_percentage.label }}
+                        </label>
+                        <div class="relative">
+                            {{ form.variable_percentage(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500") }}
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-gray-500 dark:text-gray-400">%</span>
+                            </div>
+                        </div>
+                        {% if form.variable_percentage.errors %}
+                            {% for error in form.variable_percentage.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Applied to users with Variable earning type</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <p class="mb-4 text-sm text-gray-700 dark:text-gray-300">
+                        Creating a new earnings period will:
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li>Generate a new earnings period for the selected month</li>
+                            <li>Calculate earnings for all users based on their daily balances</li>
+                            <li>Require approval from at least one other admin before distribution</li>
+                        </ul>
+                    </p>
+                </div>
+                
+                {{ form.submit(class="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800") }}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
