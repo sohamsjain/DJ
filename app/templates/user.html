@@ -7,7 +7,6 @@
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">{{ user.username }}</h1>
             <h2 class="text-lg text-gray-500 dark:text-gray-300 mb-3">Email: {{ user.email }}</h2>
             <h2 class="text-lg text-gray-500 dark:text-gray-300 mb-3">Phone Number: {{ user.phone }}</h2>
-            <h2 class="text-lg text-gray-500 dark:text-gray-300 mb-3">Member Since: {{ user.created_at_est }}</h2>
             <span class="px-2.5 py-0.5 text-lg font-medium rounded
                 {% if user.earning_type == 'Fixed' %}
                     bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300
