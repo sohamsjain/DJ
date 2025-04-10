@@ -259,7 +259,10 @@ class User(UserMixin, db.Model):
             db.session.add(day)
             new_days.append(day)
 
-            current_date += timedelta(days=1)
+            next_date = (current_date + timedelta(days=1)).astimezone(nytz)
+            delta = next_date.tzinfo._utcoffset-current_date.tzinfo._utcoffset
+            next_date = next_date - delta if delta else next_date
+            current_date = next_date
 
         if new_days:
             db.session.commit()
