@@ -567,7 +567,10 @@ class Earning(db.Model):
 
         # Update all user earnings to SETTLEMENT_PENDING
         for user_earning in self.user_earnings:
-            user_earning.status = UserEarningStatus.SETTLEMENT_PENDING
+            if user_earning.total_amount:
+                user_earning.status = UserEarningStatus.SETTLEMENT_PENDING
+                continue
+            user_earning.status = UserEarningStatus.COMPLETE
 
         db.session.commit()
 
@@ -762,7 +765,7 @@ class EarningService:
 
         # Get last day of month by finding days in month
         _, last_day_num = calendar.monthrange(year, month)
-        last_day = datetime(year, month, last_day_num, 23, 59, 59, 999999, tzinfo=nytz)
+        last_day = datetime(year, month, last_day_num, 23, 59, tzinfo=nytz)
 
         return first_day, last_day
 
