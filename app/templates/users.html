@@ -11,7 +11,7 @@
         </div>
         <div class="text-right">
             <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Balance</h4>
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">${{ "${:,.2f}".format(total_balance) }}</h2>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ "${:,.2f}".format(total_balance) }}</h2>
         </div>
     </div>
     <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700">
@@ -92,8 +92,8 @@
                         </span>
                         {% endif %}
                     </td>
-                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400 text-right">${{ "${:,.2f}".format(user.settlements_pending) }}</td>
-                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400 text-right">${{ "${:,.2f}".format(user.balance) }}</td>
+                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400 text-right">{{ "${:,.2f}".format(user.settlements_pending) }}</td>
+                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400 text-right">{{ "${:,.2f}".format(user.balance) }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>

@@ -64,7 +64,7 @@
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Current Balance:</dt>
-                            <dd class="text-lg font-bold text-gray-900 dark:text-white">${{ "${:,.2f}".format(user_earning.user.balance) }}</dd>
+                            <dd class="text-lg font-bold text-gray-900 dark:text-white">{{ "${:,.2f}".format(user_earning.user.balance) }}</dd>
                         </div>
                     </dl>
                 </div>
@@ -110,7 +110,7 @@
                     <h2 class="text-lg font-semibold text-blue-700 dark:text-blue-300 mb-4">Total Earning</h2>
                     <div class="flex flex-col items-center justify-center h-[calc(100%-2rem)]">
                         <p class="text-sm font-medium text-blue-700 dark:text-blue-300">Total Amount</p>
-                        <p class="text-5xl font-bold text-blue-700 dark:text-blue-300">${{ "${:,.2f}".format(user_earning.total_amount) }}</p>
+                        <p class="text-5xl font-bold text-blue-700 dark:text-blue-300">{{ "${:,.2f}".format(user_earning.total_amount) }}</p>
                         
                         {% if user_earning.status == 'Complete' and user_earning.completed_at %}
                         <div class="mt-6 text-center">
@@ -143,9 +143,9 @@
                             <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {{ day.date.strftime('%b %d, %Y') }}
                             </th>
-                            <td class="px-6 py-4">${{ "${:,.2f}".format(day.closing_balance) }}</td>
+                            <td class="px-6 py-4">{{ "${:,.2f}".format(day.closing_balance) }}</td>
                             <td class="px-6 py-4">{{ "%.4f"|format(day.percentage_applied) }}%</td>
-                            <td class="px-6 py-4 font-medium text-green-600 dark:text-green-500">${{ "${:,.2f}".format(day.daily_earning) }}</td>
+                            <td class="px-6 py-4 font-medium text-green-600 dark:text-green-500">{{ "${:,.2f}".format(day.daily_earning) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -154,7 +154,7 @@
                             <th scope="row" class="px-6 py-3 text-base">Total</th>
                             <td class="px-6 py-3">-</td>
                             <td class="px-6 py-3">{{ "%.2f"|format(user_earning.percentage) }}%</td>
-                            <td class="px-6 py-3">${{ "${:,.2f}".format(user_earning.total_amount) }}</td>
+                            <td class="px-6 py-3">{{ "${:,.2f}".format(user_earning.total_amount) }}</td>
                         </tr>
                     </tfoot>
                 </table>
