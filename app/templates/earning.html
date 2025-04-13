@@ -55,17 +55,17 @@
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Total Fixed
                                 Earnings:
                             </dt>
-                            <dd class="text-sm font-semibold">${{ "%.2f"|format(fixed_total) }}</dd>
+                            <dd class="text-sm font-semibold">${{ "${:,.2f}".format(fixed_total) }}</dd>
                         </div>
                         <div class="flex">
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Total Variable
                                 Earnings:
                             </dt>
-                            <dd class="text-sm font-semibold">${{ "%.2f"|format(variable_total) }}</dd>
+                            <dd class="text-sm font-semibold">${{ "${:,.2f}".format(variable_total) }}</dd>
                         </div>
                         <div class="flex">
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Grand Total:</dt>
-                            <dd class="text-sm font-semibold">${{ "%.2f"|format(grand_total) }}</dd>
+                            <dd class="text-sm font-semibold">${{ "${:,.2f}".format(grand_total) }}</dd>
                         </div>
                     </dl>
                 </div>
@@ -193,7 +193,7 @@
                                 </span>
                         </td>
                         <td class="px-6 py-4">{{ "%.2f"|format(user_earning.percentage) }}%</td>
-                        <td class="px-6 py-4 font-medium">${{ "%.2f"|format(user_earning.total_amount) }}</td>
+                        <td class="px-6 py-4 font-medium">${{ "${:,.2f}".format(user_earning.total_amount) }}</td>
                         <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs font-medium rounded whitespace-nowrap
                                     {% if user_earning.status == 'Draft' %}

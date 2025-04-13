@@ -98,7 +98,7 @@
                     </td>
                     <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-white text-right">
                         <span class="{% if transaction.type == 'Withdrawal' %}text-red-800{% else %}text-green-800{% endif %}">
-                            {% if transaction.type == 'Withdrawal' %}-{% else %}+{% endif %}${{ "%.2f"|format(transaction.amount|abs) }}
+                            {% if transaction.type == 'Withdrawal' %}-{% else %}+{% endif %}${{ "${:,.2f}".format(transaction.amount|abs) }}
                         </span>
                     </td>
                 </tr>

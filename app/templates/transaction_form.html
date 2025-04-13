@@ -45,7 +45,7 @@
                         {% endif %}
                         {% if transaction_type == 'Withdrawal' %}
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                                Available balance: ${{ "%.2f"|format(user.balance) }}
+                                Available balance: ${{ "${:,.2f}".format(user.balance) }}
                             </p>
                         {% endif %}
                     </div>

@@ -55,7 +55,7 @@
                         </div>
                         <div class="flex">
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Amount:</dt>
-                            <dd class="text-sm font-semibold">${{ "%.2f"|format(transaction.amount) }}</dd>
+                            <dd class="text-sm font-semibold">${{ "${:,.2f}".format(transaction.amount) }}</dd>
                         </div>
                         {% if transaction.reference_id %}
                         <div class="flex">
@@ -76,11 +76,11 @@
                         </div>
                         <div class="flex">
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Balance Before:</dt>
-                            <dd class="text-sm">${{ "%.2f"|format(transaction.balance_before) }}</dd>
+                            <dd class="text-sm">${{ "${:,.2f}".format(transaction.balance_before) }}</dd>
                         </div>
                         <div class="flex">
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 w-40">Balance After:</dt>
-                            <dd class="text-sm">${{ "%.2f"|format(transaction.balance_after) }}</dd>
+                            <dd class="text-sm">${{ "${:,.2f}".format(transaction.balance_after) }}</dd>
                         </div>
                         {% endif %}
                     </dl>
