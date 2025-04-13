@@ -87,7 +87,7 @@
                 <tr class="hover:bg-gray-800 cursor-pointer"
                     data-href="{{ url_for('main.user', id=user.id) }}">
                     <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">{{ user.username }}</td>
-                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400 text-right">{{ "({}{}{}) {}{}{}-{}{}{}{}".format(*phone_number) }}</td>
+                    <td class="font-medium text-lg text-gray-900 whitespace-nowrap dark:text-gray-400">{{ "({}{}{}) {}{}{}-{}{}{}{}".format(*user.phone) }}</td>
                     <td>
                         <span class="px-2 py-1 text-sm font-medium whitespace-nowrap
                             {% if user.earning_type == 'Fixed' %}text-red-300 bg-red-900
