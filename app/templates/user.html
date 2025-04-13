@@ -76,7 +76,7 @@
                             <div>
                                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Balance</h3>
                                 <p class="text-2xl font-bold text-gray-900 dark:text-white">{{
-                                    "%.2f"|format(user.balance) }}</p>
+                                    "${:,.2f}".format(user.balance) }}</p>
                             </div>
                         </div>
                     </div>
@@ -94,7 +94,7 @@
                             <div>
                                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Deposits</h3>
                                 <p class="text-2xl font-bold text-gray-900 dark:text-white">{{
-                                    "%.2f"|format(statistics.total_deposits) }}</p>
+                                    "${:,.2f}".format(statistics.total_deposits) }}</p>
                             </div>
                         </div>
                     </div>
@@ -112,7 +112,7 @@
                             <div>
                                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Withdrawals</h3>
                                 <p class="text-2xl font-bold text-gray-900 dark:text-white">{{
-                                    "%.2f"|format(statistics.total_withdrawals) }}</p>
+                                    "${:,.2f}".format(statistics.total_withdrawals) }}</p>
                             </div>
                         </div>
                     </div>
@@ -129,7 +129,7 @@
                             <div>
                                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Earnings</h3>
                                 <p class="text-2xl font-bold text-gray-900 dark:text-white">{{
-                                    "%.2f"|format(statistics.total_earnings) }}</p>
+                                    "${:,.2f}".format(statistics.total_earnings) }}</p>
                             </div>
                         </div>
                     </div>
@@ -147,7 +147,7 @@
                             <div>
                                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Paid Earnings</h3>
                                 <p class="text-2xl font-bold text-gray-900 dark:text-white">{{
-                                    "%.2f"|format(statistics.earnings_paid) }}</p>
+                                    "${:,.2f}".format(statistics.earnings_paid) }}</p>
                             </div>
                         </div>
                     </div>
@@ -165,7 +165,7 @@
                             <div>
                                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Unpaid Earnings</h3>
                                 <p class="text-2xl font-bold text-gray-900 dark:text-white">{{
-                                    "%.2f"|format(statistics.earnings_unpaid) }}</p>
+                                    "${:,.2f}".format(statistics.earnings_unpaid) }}</p>
                             </div>
                         </div>
                     </div>
